@@ -49,9 +49,10 @@ pmx.initModule({
 
 	let timeStampFormat = config.timeStampFormat || "";
 	let redisKeyPrefix = config.redisKeyPrefix || "pm2logs";
-	let redisUrl = config.redisUrl || "";
+	let redisOptions = config.redisOptions || "";
+	let expire = config.expire || 7*24*60*60;
 
-	let redisClient = redis.createClient(redisUrl);
+	let redisClient = redis.createClient(redisOptions);
 	redisClient.on("error", function(error) {
     console.log(error);
 	});
@@ -83,17 +84,23 @@ pmx.initModule({
       bus.on('log:PM2', function (packet) {
 				let msg = makeMsg(packet, 'stdout');
         console.log('log:PM2', msg, JSON.stringify(msg), packet.data);
-				redisClient.rpushAsync(getRedisKeyName(), JSON.stringify(msg));
+				let redisKey = getRedisKeyName();
+				redisClient.rpushAsync(redisKey, JSON.stringify(msg));
+				redisClient.expireAsync(redisKey, expire);
       });
       bus.on('log:out', function (packet) {
 				let msg = makeMsg(packet, 'stdout');
         console.log('log:out', msg, JSON.stringify(msg), packet.data);
-				redisClient.rpushAsync(getRedisKeyName(), JSON.stringify(msg));
+				let redisKey = getRedisKeyName();
+				redisClient.rpushAsync(redisKey, JSON.stringify(msg));
+				redisClient.expireAsync(redisKey, expire);
       });
       bus.on('log:err', function (packet) {
 				let msg = makeMsg(packet, 'stderr');
         console.log('log:err', msg, JSON.stringify(msg), packet.data);
-				redisClient.rpushAsync(getRedisKeyName(), JSON.stringify(msg));
+				let redisKey = getRedisKeyName();
+				redisClient.rpushAsync(redisKey, JSON.stringify(msg));
+				redisClient.expireAsync(redisKey, expire);
       });
     });
   });

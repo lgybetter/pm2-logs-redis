@@ -1,0 +1,20 @@
+{
+  "name": "pm2-logs-redis",
+  "version": "0.1.0",
+  "description": "Forward PM2 logs via redis ready for Logstash",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon index.js"
+  },
+  "dependencies": {
+    "bluebird": "^3.5.0",
+    "co": "^4.6.0",
+    "moment": "^2.18.1",
+    "nodemon": "^1.11.0",
+    "pm2": "^2.0.18",
+    "pmx": "^0.6.8",
+    "redis": "^2.7.1"
+  },
+  "author": "yangjiangjie@bbcloud.com",
+  "license": "MIT"
+}

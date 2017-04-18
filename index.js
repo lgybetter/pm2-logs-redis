@@ -9,18 +9,27 @@ Promise.promisifyAll(redis.Multi.prototype);
 const pm2 = require('pm2');
 const pmx = require('pmx');
 
-const os = require('os');
-let ips = [];
-var network = os.networkInterfaces();
-for(var dev in network){
-  for(var i = 0; i < network[dev].length; i++) {
-      var json = network[dev][i];
-      if(json.family == 'IPv4') {
-				ips.push(json.address);
-      }
-  }
+
+
+let host = "";
+
+function freshHost(){
+	const os = require('os');
+	let ips = [];
+	var network = os.networkInterfaces();
+	for(var dev in network){
+		for(var i = 0; i < network[dev].length; i++) {
+		    var json = network[dev][i];
+		    if(json.family == 'IPv4' && json.mac && json.mac != '00:00:00:00:00:00') {
+					ips.push(json.address);
+		    }
+		}
+	}
+	host = ips.sort().join(',');
+	setTimeout(freshHost, 30000);
 }
-let host = ips.sort().join(',');
+
+freshHost();
 
 console.log('host', host);
 
